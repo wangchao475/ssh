@@ -56,6 +56,7 @@ type Server struct {
 	// provide extensions to the protocol, such as tcpip forwarding. By default
 	// no handlers are enabled.
 	RequestHandlers map[string]RequestHandler
+	SftpHandlers    map[string]Handler //tina add
 
 	listenerWg sync.WaitGroup
 	mu         sync.RWMutex
@@ -428,4 +429,7 @@ func (srv *Server) trackConn(c *gossh.ServerConn, add bool) {
 		delete(srv.conns, c)
 		srv.connWg.Done()
 	}
+}
+func (srv *Server) SetSftpHandler(name string, handler Handler) {
+	srv.SftpHandlers[name] = handler
 }
