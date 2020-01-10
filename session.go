@@ -93,7 +93,7 @@ func DefaultSessionHandler(srv *Server, conn *gossh.ServerConn, newChan gossh.Ne
 		ptyCb:      srv.PtyCallback,
 		sessReqCb:  srv.SessionRequestCallback,
 		ctx:        ctx,
-		sftpHander: srv.SftpHandler,
+		sftpHander: srv.SftpServeHandler,
 	}
 	sess.handleRequests(reqs)
 }
@@ -114,7 +114,7 @@ type session struct {
 	ctx        Context
 	sigCh      chan<- Signal
 	sigBuf     []Signal
-	sftpHander Handler
+	sftpHander SftpHander
 }
 
 func (sess *session) Write(p []byte) (n int, err error) {

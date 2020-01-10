@@ -55,8 +55,8 @@ type Server struct {
 	// RequestHandlers allow overriding the server-level request handlers or
 	// provide extensions to the protocol, such as tcpip forwarding. By default
 	// no handlers are enabled.
-	RequestHandlers map[string]RequestHandler
-	SftpHandler     Handler //tina add
+	RequestHandlers  map[string]RequestHandler
+	SftpServeHandler SftpHander //tina add
 
 	listenerWg sync.WaitGroup
 	mu         sync.RWMutex
@@ -430,6 +430,6 @@ func (srv *Server) trackConn(c *gossh.ServerConn, add bool) {
 		srv.connWg.Done()
 	}
 }
-func (srv *Server) SetSftpHandler(handler Handler) {
-	srv.SftpHandler = handler
+func (srv *Server) SetSftpHandler(handler SftpHander) {
+	srv.SftpServeHandler = handler
 }
