@@ -87,13 +87,13 @@ func DefaultSessionHandler(srv *Server, conn *gossh.ServerConn, newChan gossh.Ne
 		return
 	}
 	sess := &session{
-		Channel:     ch,
-		conn:        conn,
-		handler:     srv.Handler,
-		ptyCb:       srv.PtyCallback,
-		sessReqCb:   srv.SessionRequestCallback,
-		ctx:         ctx,
-		sftpHanders: srv.SftpHandlers,
+		Channel:    ch,
+		conn:       conn,
+		handler:    srv.Handler,
+		ptyCb:      srv.PtyCallback,
+		sessReqCb:  srv.SessionRequestCallback,
+		ctx:        ctx,
+		sftpHander: srv.SftpHandler,
 	}
 	sess.handleRequests(reqs)
 }
@@ -101,20 +101,20 @@ func DefaultSessionHandler(srv *Server, conn *gossh.ServerConn, newChan gossh.Ne
 type session struct {
 	sync.Mutex
 	gossh.Channel
-	conn        *gossh.ServerConn
-	handler     Handler
-	handled     bool
-	exited      bool
-	pty         *Pty
-	winch       chan Window
-	env         []string
-	ptyCb       PtyCallback
-	sessReqCb   SessionRequestCallback
-	rawCmd      string
-	ctx         Context
-	sigCh       chan<- Signal
-	sigBuf      []Signal
-	sftpHanders map[string]Handler
+	conn       *gossh.ServerConn
+	handler    Handler
+	handled    bool
+	exited     bool
+	pty        *Pty
+	winch      chan Window
+	env        []string
+	ptyCb      PtyCallback
+	sessReqCb  SessionRequestCallback
+	rawCmd     string
+	ctx        Context
+	sigCh      chan<- Signal
+	sigBuf     []Signal
+	sftpHander Handler
 }
 
 func (sess *session) Write(p []byte) (n int, err error) {
@@ -303,11 +303,8 @@ func (sess *session) handleRequests(reqs <-chan *gossh.Request) {
 			SetAgentRequested(sess.ctx)
 			req.Reply(true, nil)
 		case "subsystem":
-			subname := string(req.Payload[4:])
-			handler, ok := sess.sftpHanders[subname]
-			if !ok {
-				req.Reply(false, nil)
-			}
+			//subname := string(req.Payload[4:])
+			handler := sess.sftpHander
 			sess.handled = true
 			req.Reply(true, nil)
 
